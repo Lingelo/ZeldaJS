@@ -1,0 +1,12 @@
+export const RoofType = {
+    ROOF_TILE_VIOLET: 'ROOF_TILE_VIOLET',
+    ROOF_TILE_RED: 'ROOF_TILE_RED',
+    ROOF_TILE_BLUE: 'ROOF_TILE_BLUE',
+    STRONG_BLUE: 'STRONG_BLUE',
+    STRONG_VIOLET: 'STRONG_VIOLET',
+    ROCK: 'ROCK',
+    RED_SHOP: 'RED_SHOP',
+    VIOLET_SHOP: 'VIOLET_SHOP'
+}
+
+Object.freeze(RoofType);
