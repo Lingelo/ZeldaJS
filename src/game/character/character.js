@@ -11,8 +11,10 @@ export class Character {
         this.frame = 0;
         this.offsetX = 0;
         this.offsetY = 0;
-        this.speed = 5;
+        this.speed = 3;
         this.page = page;
+        this.fromRight = false;
+        this.fromDown = false;
 
         subscribe(() => {
             this.page = getState().page;
@@ -37,25 +39,25 @@ export class Character {
 
     checkChangePage() {
 
-        if (16 * this.x + this.offsetX < - 13/2) {
+        if (16 * this.x + this.offsetX < -13 / 2) {
             this.page = {
                 x: this.page.x,
                 y: this.page.y - 1
             }
             this.offsetX = this.offsetX + 10 * 16;
-        } else if (16 * this.x + this.offsetX > 160 - 13/2) {
+        } else if (16 * this.x + this.offsetX > 160 - 13 / 2) {
             this.page = {
                 x: this.page.x,
                 y: this.page.y + 1
             }
             this.offsetX = this.offsetX - 10 * 16;
-        } else if (16 * this.y + this.offsetY > 120 + 16/2) {
+        } else if (16 * this.y + this.offsetY > 120 + 16 / 2) {
             this.page = {
                 x: this.page.x + 1,
                 y: this.page.y
             }
-            this.offsetY = this.offsetY - 8 * 16 - 16/2;
-        } else if (16 * this.y + this.offsetY < - 16/2) {
+            this.offsetY = this.offsetY - 8 * 16 - 16 / 2;
+        } else if (16 * this.y + this.offsetY < -16 / 2) {
             this.page = {
                 x: this.page.x - 1,
                 y: this.page.y
@@ -67,7 +69,7 @@ export class Character {
     }
 
     getFrame(direction) {
-        if (this.frame % this.speed === 0) {
+        if (this.frame === 0) {
             this.frame = 1;
             return direction.first;
         } else if (this.frame === 1) {
@@ -77,8 +79,19 @@ export class Character {
     }
 
     move(direction) {
+
         this.direction = direction;
         this.frame = this.frame === 1 ? 0 : 1;
+        const next = this.computeNextOffSet(direction);
+        console.log('x',next.x, 'y',next.y)
+        const tileCode = this.map[((this.page.x - 1) * 8) + next.y][((this.page.y - 1) * 10) + next.x];
+        console.log(tileCode)
+        console.log("fromRight", this.fromRight, "fromDown", this.fromDown)
+        if (![85, 60, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 77, 82, 101, 103, 116, 125].includes(tileCode)) {
+             return this.page;
+        }
+
+
         switch (direction) {
         case DIRECTION.UP:
             this.offsetY = this.offsetY - this.speed;
@@ -98,11 +111,52 @@ export class Character {
             break;
         }
 
-        // const nextX = Math.trunc(this.offsetX/16 - 13/2 + this.x + 8);
-        // const nextY = Math.trunc(this.offsetY/16 - 16/2 + this.y + 10);
-        // console.log((nextX - 1) + this.page.x * 8, (nextY- 1) + this.page.y * 10, this.map[(nextY- 1) + this.page.y * 10][(nextX - 1) + this.page.x * 8])
-
         return this.page;
+
+    }
+
+    computeNextOffSet(direction) {
+
+        let nextOffsetX = this.offsetX;
+        let nextOffsetY = this.offsetY;
+
+        switch (direction) {
+            case DIRECTION.UP:
+                nextOffsetY = nextOffsetY - this.speed;
+                if(this.fromDown) {
+                    this.fromDown = false;
+                    nextOffsetY = nextOffsetY - 16;
+                }
+                return {
+                    x: Math.trunc((this.offsetX) / 16  + this.x),
+                    y: Math.trunc((nextOffsetY + 16/2) / 16 + this.y)
+                }
+            case DIRECTION.LEFT:
+                nextOffsetX = nextOffsetX - this.speed;
+                if(this.fromRight) {
+                    this.fromRight = false;
+                    nextOffsetX = nextOffsetX - 13;
+                }
+                return {
+                    x: Math.trunc((nextOffsetX) / 16  + this.x),
+                    y: Math.trunc((this.offsetY + 16/2) / 16 + this.y)
+                }
+            case DIRECTION.DOWN:
+                this.fromDown = true;
+                nextOffsetY = nextOffsetY + this.speed + 16;
+                return {
+                    x: Math.trunc((this.offsetX) / 16  + this.x),
+                    y: Math.trunc((nextOffsetY + 16/2) / 16 + this.y)
+                }
+            case DIRECTION.RIGHT:
+                this.fromRight = true;
+                nextOffsetX = nextOffsetX + this.speed + 13
+                return {
+                    x: Math.trunc((nextOffsetX) / 16  + this.x),
+                    y: Math.trunc((this.offsetY + 16/2) / 16 + this.y)
+                }
+            }
+
 
     }
 }
