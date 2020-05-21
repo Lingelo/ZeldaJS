@@ -4,7 +4,7 @@ import { DIRECTION } from '../game/direction';
 import { mapRenderer } from '../utils/map-renderer';
 
 const initPage =  {
-    x: 3,
+    x: 2,
     y: 3
 };
 
