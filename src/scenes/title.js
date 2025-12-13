@@ -38,7 +38,7 @@ export function titleScene() {
 
     // Instruction
     const startText = add([
-        text('Appuyez sur ENTREE', { 
+        text('Touchez pour commencer', {
             size: 8,
             font: 'sink',
         }),
@@ -74,6 +74,15 @@ export function titleScene() {
     });
 
     onKeyPress('space', () => {
+        go('game');
+    });
+
+    // Support tactile pour mobile
+    onClick(() => {
+        go('game');
+    });
+
+    onTouchStart(() => {
         go('game');
     });
 }
