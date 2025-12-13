@@ -1,25 +1,21 @@
 {
   "name": "zeldajs",
-  "version": "1.0.0",
-  "description": "Zelda Link awakening JS",
+  "version": "3.0.0",
+  "description": "Zelda Link's Awakening JS - Powered by KAPLAY",
   "private": true,
+  "type": "module",
   "scripts": {
-    "start": "webpack-dev-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "lint": "eslint --fix \"src/**/*js\""
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [],
+  "keywords": ["zelda", "game", "kaplay", "javascript"],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "file-loader": "^4.0.0",
-    "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.3",
-    "webpack-dev-server": "^3.7.1"
+    "vite": "^5.0.0"
   },
   "dependencies": {
-    "ws": "7.5.10",
-    "eslint": "6.8.0"
+    "kaplay": "^3001.0.0"
   }
 }
