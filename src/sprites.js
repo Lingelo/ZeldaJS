@@ -92,11 +92,14 @@ export function getTileQuad(tileId, frame = 0) {
 
 // Charger tous les sprites
 export function loadSprites() {
+    // Utiliser import.meta.env.BASE_URL pour le chemin correct sur GitHub Pages
+    const base = import.meta.env.BASE_URL;
+
     // Tilemap
-    loadSprite('tileset', '/map.png');
-    
+    loadSprite('tileset', `${base}map.png`);
+
     // Personnage avec animations
-    loadSprite('link', '/character.png', {
+    loadSprite('link', `${base}character.png`, {
         sliceX: 10,
         sliceY: 8,
         anims: {
