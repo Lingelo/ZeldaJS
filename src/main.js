@@ -6,15 +6,20 @@ import { gameScene } from './scenes/game.js';
 
 const { TILE_SIZE, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, SCALE } = CONFIG;
 
+// Calculer la taille optimale sans stretch
+const gameWidth = VIEWPORT_WIDTH * TILE_SIZE;
+const gameHeight = VIEWPORT_HEIGHT * TILE_SIZE;
+
 // Initialisation de KAPLAY
 kaplay({
-    width: VIEWPORT_WIDTH * TILE_SIZE,
-    height: VIEWPORT_HEIGHT * TILE_SIZE,
+    width: gameWidth,
+    height: gameHeight,
     scale: SCALE,
-    background: [20, 40, 20],
+    stretch: false,        // Pas de stretch !
+    letterbox: true,       // Bandes noires pour garder l'aspect ratio
+    background: [0, 0, 0], // Fond noir pour les bandes
     crisp: true,
     pixelDensity: 1,
-    canvas: document.querySelector('canvas') || undefined,
 });
 
 // Charger les sprites

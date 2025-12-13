@@ -1,6 +1,7 @@
 import { CONFIG, START_PAGE, START_POS } from '../config.js';
 import { GameMap } from '../systems/map.js';
 import { createPlayer, handlePlayerMovement, handlePlayerInteraction } from '../entities/player.js';
+import { createTouchControls, isMobile, touchState } from '../systems/touch-controls.js';
 
 export function gameScene() {
     const { TILE_SIZE, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, TRANSITION_DURATION } = CONFIG;
@@ -15,6 +16,11 @@ export function gameScene() {
     // Créer le joueur
     const player = createPlayer(START_POS.x, START_POS.y);
 
+    // Créer les contrôles tactiles sur mobile
+    if (isMobile()) {
+        createTouchControls();
+    }
+
     // État de transition
     let transitioning = false;
 
@@ -22,11 +28,11 @@ export function gameScene() {
     let dialogBox = null;
 
     // Afficher un dialogue
-    function showDialog(text) {
+    function showDialog(dialogText) {
         if (dialogBox) dialogBox.destroy();
-        
+
         player.canMove = false;
-        
+
         dialogBox = add([
             rect(screenWidth - 16, 40),
             pos(8, screenHeight - 48),
@@ -36,22 +42,34 @@ export function gameScene() {
         ]);
 
         add([
-            text(text, { size: 8, font: 'sink', width: screenWidth - 32 }),
+            text(dialogText, { size: 8, font: 'sink', width: screenWidth - 32 }),
             pos(16, screenHeight - 44),
             color(255, 255, 255),
             z(101),
             'dialog-text',
         ]);
 
-        // Fermer avec espace
-        const closeHandler = onKeyPress('space', () => {
+        // Fermer avec espace ou tactile
+        const closeDialog = () => {
             if (dialogBox) {
                 dialogBox.destroy();
                 destroyAll('dialog-text');
                 dialogBox = null;
                 player.canMove = true;
-                closeHandler.cancel();
             }
+        };
+
+        const closeHandler = onKeyPress('space', closeDialog);
+
+        // Fermer avec tactile aussi
+        let wasActionPressed = touchState.action;
+        const touchHandler = onUpdate(() => {
+            if (touchState.action && !wasActionPressed && dialogBox) {
+                closeDialog();
+                closeHandler.cancel();
+                touchHandler.cancel();
+            }
+            wasActionPressed = touchState.action;
         });
     }
 

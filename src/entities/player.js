@@ -1,4 +1,5 @@
 import { CONFIG } from '../config.js';
+import { isDirectionPressed, touchState } from '../systems/touch-controls.js';
 
 // Directions
 const DIRS = {
@@ -11,7 +12,7 @@ const DIRS = {
 // Créer le joueur
 export function createPlayer(startX, startY) {
     const { TILE_SIZE, PLAYER_SPEED } = CONFIG;
-    
+
     const player = add([
         sprite('link'),
         pos(startX * TILE_SIZE + TILE_SIZE / 2, startY * TILE_SIZE + TILE_SIZE / 2),
@@ -23,37 +24,38 @@ export function createPlayer(startX, startY) {
             dir: 'down',
             isMoving: false,
             canMove: true,
+            lastActionTime: 0,
         },
         'player',
     ]);
 
     player.play('idle-down');
-    
+
     return player;
 }
 
 // Gérer le mouvement du joueur
 export function handlePlayerMovement(player, gameMap) {
     if (!player.canMove) return;
-    
+
     let dir = null;
     let moved = false;
 
-    // Priorité aux touches
-    if (isKeyDown('left') || isKeyDown('a')) {
+    // Vérifier les directions (clavier + tactile)
+    if (isDirectionPressed('left')) {
         dir = 'left';
-    } else if (isKeyDown('right') || isKeyDown('d')) {
+    } else if (isDirectionPressed('right')) {
         dir = 'right';
-    } else if (isKeyDown('up') || isKeyDown('w')) {
+    } else if (isDirectionPressed('up')) {
         dir = 'up';
-    } else if (isKeyDown('down') || isKeyDown('s')) {
+    } else if (isDirectionPressed('down')) {
         dir = 'down';
     }
 
     if (dir) {
         const dirVec = DIRS[dir];
         const newPos = player.pos.add(dirVec.scale(player.speed * dt()));
-        
+
         // Vérifier collision
         if (!gameMap.checkCollision(newPos.x, newPos.y, 12, 14)) {
             player.pos = newPos;
@@ -61,14 +63,14 @@ export function handlePlayerMovement(player, gameMap) {
             // Essayer de glisser le long du mur
             const slideX = vec2(newPos.x, player.pos.y);
             const slideY = vec2(player.pos.x, newPos.y);
-            
+
             if (!gameMap.checkCollision(slideX.x, slideX.y, 12, 14)) {
                 player.pos = slideX;
             } else if (!gameMap.checkCollision(slideY.x, slideY.y, 12, 14)) {
                 player.pos = slideY;
             }
         }
-        
+
         // Animation
         if (player.dir !== dir || !player.isMoving) {
             player.dir = dir;
@@ -89,9 +91,14 @@ export function handlePlayerMovement(player, gameMap) {
 
 // Interaction avec l'environnement
 export function handlePlayerInteraction(player, gameMap, onInteract) {
-    onKeyPress('space', () => {
+    const doInteraction = () => {
         if (!player.canMove) return;
-        
+
+        // Éviter les doubles interactions
+        const now = time();
+        if (now - player.lastActionTime < 0.3) return;
+        player.lastActionTime = now;
+
         const { TILE_SIZE } = CONFIG;
         const dirOffsets = {
             up: vec2(0, -TILE_SIZE),
@@ -99,12 +106,24 @@ export function handlePlayerInteraction(player, gameMap, onInteract) {
             left: vec2(-TILE_SIZE, 0),
             right: vec2(TILE_SIZE, 0),
         };
-        
+
         const checkPos = player.pos.add(dirOffsets[player.dir]);
         const interactive = gameMap.getInteractiveAt(checkPos.x, checkPos.y);
-        
+
         if (interactive && onInteract) {
             onInteract(interactive);
         }
+    };
+
+    // Clavier
+    onKeyPress('space', doInteraction);
+
+    // Tactile - vérifier dans la boucle de mise à jour
+    let wasActionPressed = false;
+    onUpdate(() => {
+        if (touchState.action && !wasActionPressed) {
+            doInteraction();
+        }
+        wasActionPressed = touchState.action;
     });
 }
