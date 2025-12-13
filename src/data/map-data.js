@@ -104,3 +104,13 @@ export const WALKABLE_TILES = [
     // Porte (traversable)
     126,
 ];
+
+// Tuiles interactives
+export const INTERACTIVE_TILES = {
+    102: 'sign',      // Panneau
+    115: 'well',      // Puits
+    126: 'door',      // Porte
+    127: 'telephone', // Téléphone
+    99: 'door',       // Porte bois
+    84: 'door',       // Porte grise
+};

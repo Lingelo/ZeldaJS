@@ -1,7 +1,7 @@
 {
   "name": "zeldajs",
-  "version": "2.0.0",
-  "description": "Zelda Link awakening JS - Powered by Kaboom.js",
+  "version": "3.0.0",
+  "description": "Zelda Link's Awakening JS - Powered by KAPLAY",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,13 +9,13 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
+  "keywords": ["zelda", "game", "kaplay", "javascript"],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "vite": "^5.0.0"
   },
   "dependencies": {
-    "kaboom": "^3000.1.17"
+    "kaplay": "^3001.0.0"
   }
 }
